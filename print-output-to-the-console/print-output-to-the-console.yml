@@ -1,0 +1,12 @@
+---
+- name: Installs a package and prints the result
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install the package
+      package:
+        name: mc
+        state: installed
+      register: install_result
+
+    - debug: var=install_result

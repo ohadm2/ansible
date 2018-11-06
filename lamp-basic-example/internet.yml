@@ -45,5 +45,13 @@
         mode: 0644
         
 
-
+- name: Test internet web server
+  hosts: localhost
+  become: no
+  tasks: 
+    - name: Connect to internet web server
+      uri:
+        url: http://serverb.lab.example.com
+        status_code: 200
+ 
 

@@ -1,0 +1,11 @@
+---
+- name: This is a shell test
+  hosts: serverb.lab.example.com
+
+  tasks:
+    - name: a shell test
+      shell: /sbin/ifconfig
+      register: out
+
+    - debug:
+        var: out.stdout_lines

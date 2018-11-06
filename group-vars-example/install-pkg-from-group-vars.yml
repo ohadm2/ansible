@@ -1,0 +1,8 @@
+---
+- hosts: all
+  tasks:
+    - name: Installs the "{{ package }}" package
+      package:
+         name: "{{ package }}"
+         state: latest
+

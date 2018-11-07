@@ -1,0 +1,15 @@
+---
+- vars:
+    mail_services:
+      - postfix
+      - dovecot
+  
+  hosts: all  
+
+  tasks:
+    - name: Postfix and Dovecot are installed
+      package:
+        name: "{{ item }}"
+        state: latest
+      with_items: "{{ mail_services }}"
+

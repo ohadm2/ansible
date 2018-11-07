@@ -1,0 +1,15 @@
+---
+- vars:
+    mail_services:
+      - postfix
+      - dovecot
+  
+  hosts: all  
+
+  tasks:
+    - name: Postfix and Dovecot are running
+      service:
+        name: "{{ item }}"
+        state: started
+      with_items: "{{ mail_services }}"
+

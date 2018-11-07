@@ -1,0 +1,9 @@
+---
+- hosts: all
+  tasks:
+  - name: Prints various Ansible facts
+    debug:
+      msg: >
+           The package to install on {{ ansible_fqdn }}.
+           This Ansible is using kernel {{ ansible_kernel }}.
+

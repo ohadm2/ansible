@@ -1,0 +1,6 @@
+---
+packages:
+  web_server_pkg_name: httpd
+  db_server_pkg_name: mariadb-server 
+
+

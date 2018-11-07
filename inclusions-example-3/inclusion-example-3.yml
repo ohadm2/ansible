@@ -1,0 +1,17 @@
+---
+- name: Install some packages
+  hosts: all
+  tasks:
+    - name: Includes the packages via variables file 
+      include_vars: packages.yml
+
+    - name: Includes the install task via yaml file 
+      include: install_packages.yml
+
+
+    - name: Debugs the results
+      debug: 
+        var: result
+  
+
+

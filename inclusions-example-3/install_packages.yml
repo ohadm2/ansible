@@ -1,0 +1,11 @@
+---
+- name: Installs {{ packages.web_server_pkg_name }}
+  package:
+    name: "{{ packages.web_server_pkg_name }}"
+    state: latest
+
+- name: Installs {{ packages.db_server_pkg_name }}
+  package:
+    name: "{{ packages.db_server_pkg_name }}"
+    state: latest
+

@@ -1,0 +1,16 @@
+[db-servers]
+servera.lab.example.com
+
+[web-servers]
+serverb.lab.example.com
+
+
+[servers:children]
+db-servers
+web-servers
+
+[servers:vars]
+ansible_user=devops
+ansible_become=yes
+package=httpd
+

@@ -1,0 +1,28 @@
+---
+- name: Configure file paths
+  hosts: all
+  tasks:
+    - name: Includes the variables file 
+      include_vars: paths.yml
+
+    - name: Creates the first directory
+      file:
+        path: "{{ paths.docs_path }}"
+        state: directory
+        mode: 0755
+      register: result
+
+    - name: Creates the second directory
+      file:
+        path: "{{ paths.settings_path }}"
+        state: directory
+        mode: 0755
+      register: result
+
+
+    - name: Debugs the results
+      debug: 
+        var: result
+  
+
+

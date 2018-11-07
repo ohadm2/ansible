@@ -1,0 +1,14 @@
+---
+- name: Manage users and groups
+  hosts: all
+
+  tasks:
+    - name: Make sure users exist and are in the correct groups
+      user:
+        name: "{{ item.name }}"
+        state: present
+        groups: "{{ item.groups }}"
+      with_items: 
+        - { name: 'student', groups: 'root' }
+        - { name: 'devops', groups: 'postfix' }
+

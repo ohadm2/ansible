@@ -1,0 +1,17 @@
+---
+- name: Response code condition example
+  hosts: all
+  
+  tasks:
+  - name: Get Postfix service status
+    command: /usr/bin/systemctl is-active postfix
+    ignore_errors: yes
+    register: result
+
+  - name: Restart Apache HTTPD if Postfix is running
+    service:
+      name: httpd
+      state: restarted
+    when: result.rc == 0
+
+

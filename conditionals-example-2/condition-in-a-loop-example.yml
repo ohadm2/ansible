@@ -1,0 +1,12 @@
+---
+- name: Test a Conditional example
+  hosts: all
+ 
+  tasks:
+    - name: "Run only if there is 300M or more on / mount point"
+      package:
+        name: mariadb-server
+        state: latest
+      with_items: "{{ ansible_mounts }}"
+      when: item.mount == "/" and item.size_available > 30000000
+

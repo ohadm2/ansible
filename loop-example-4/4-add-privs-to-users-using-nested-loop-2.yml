@@ -1,0 +1,27 @@
+--- 
+- name: Add privileges to DB users per DB
+  hosts: all
+
+  vars:
+    db_users:
+      - joe
+      - jane
+
+    databases:
+      - clientdb
+      - employeedb
+      - providerdb
+
+  tasks:
+    - name: Loop through DBs and users
+      mysql_user:
+        name: "{{ item[0] }}"
+        priv: "{{ item[1] }}.*:ALL"
+        append_privs: yes
+        password:
+      with_nested:
+        - "{{ db_users }}"
+        - "{{ databases }}"
+
+
+

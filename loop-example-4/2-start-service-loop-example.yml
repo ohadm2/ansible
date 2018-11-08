@@ -1,0 +1,14 @@
+---
+- vars:
+    services:
+      - mariadb
+  
+  hosts: all  
+
+  tasks:
+    - name: Start services via a loop
+      service:
+        name: "{{ item }}"
+        state: started
+      with_items: "{{ services }}"
+

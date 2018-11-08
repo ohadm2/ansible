@@ -1,0 +1,15 @@
+---
+- vars:
+    packages:
+      - mariadb-server
+      - MySQL-python
+  
+  hosts: all  
+
+  tasks:
+    - name: install packages via a loop
+      package:
+        name: "{{ item }}"
+        state: latest
+      with_items: "{{ packages }}"
+

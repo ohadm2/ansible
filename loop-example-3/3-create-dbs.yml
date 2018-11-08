@@ -1,0 +1,16 @@
+---
+- vars:
+    databases:
+      - clientdb
+      - employeedb
+      - providerdb
+  
+  hosts: all  
+
+  tasks:
+    - name: Create new databases with a loop
+      mysql_db:
+        name: "{{ item }}"
+        state: present
+      with_items: "{{ databases }}"
+

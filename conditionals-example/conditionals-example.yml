@@ -1,0 +1,36 @@
+---
+- name: Conditionals examples
+  hosts: all
+  
+  vars:
+    my_var: true
+    my_package: httpd
+    my_user: devops
+
+    special_users:
+      - root
+      - devops
+      - admin
+
+  tasks:
+  - name: "Run only if my_var is true"
+    shell: /bin/id
+    when: my_var
+
+  - name: "Run only if my_package is defined"
+    package:
+      name: "{{ my_package }}"
+    when: my_package is defined
+
+  - name: "Run only if my_user is in special_users"
+    user:
+      name: "{{ my_user }}"
+      groups: wheel
+      append: yes
+    when: my_user in special_users
+
+  - name: "Run only if the current system is RedHat 7"
+    shell: /bin/hostname
+    when: ansible_distribution == "RedHat" and ansible_distribution_major_version == "7"
+
+

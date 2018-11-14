@@ -50,6 +50,7 @@ inventory: a list of machines to manage, can be created automatically using a sc
 	-> dynamic inventory:
 		-> can be created by specifing a binary file (a file with the 'executable' bit on) as an inventory
 
+        
 ansible config file:
 
 	-> ansible.cfg
@@ -57,70 +58,34 @@ ansible config file:
 	-> ansible --version returns the working location of ansible.cfg
 
 
-
-
-
-
-
 modules: 
 
-	-> docs.ansible.com
+	-> every ansible task is run using a module
+	-> each module controls a certain system/aspect
+		-> each module has properties for controlling the wanted state
 
-		-> module index
-
-
-* steps are ran horizonally by default, not vertically (e.g step 1 will run for all hosts and then step 2 for all and so on ...)
-
-* ssh/winrm/vmware api based
-	-> ssh: change sshd_config file when needed (e.g. for adding more parallel sessions etc.)
-
-* push based
-
-* uses python v2 in Linux
-
-* uses powershell in Windows
-
-* uses vSphere API in Vmware
-
-
-
-
-
-ctrl+shift+"+" - increase the size of the font in the terminal
-
-
-
-basic syntax:
-
-ansible <host/group> <command>
-
-ansible <host/group> -i <inventory-file> <command>
-
-ansible server*.com --list-hosts
-
-
-ad-hoc commands:
-
-	-> ansible all -a "ifconfig"
-
-
-
-
-
-
-ansible all -m command id - command depends on the shell we get
-ansible all -m raw get-content c:\ - raw simply sends the command as is
-
-ansible all -m setup - get host info
-ansible all -m setup -a 'filter=*eth0*'
-ansible all -m setup -a 'filter=*ansible_user*'
-
-ansible all copy src=/path/to/source/file dest=/path/to/dest/file
-
-ansible localhost -m debug -a 'var=hostvars["localhost"]'
-
-
-ansible-doc <module-name> - get info on how to use a module
+	-> a list of useful modules:
+		-> yum - for installing packages on 'yum' manager based systems  
+		-> package - for installing packages on several types of systems
+		-> service - for controlling services
+		-> shell/command - for running shell commands
+		-> firewalld - for controlling the firewall
+		-> get_url - for getting data from web servers
+			-> properties for example:
+				-> url: "http://materials.example.com/task_control/my.cnf"
+                -> dest: "{{ configure_database_path }}"
+                -> owner: mysql
+                -> group: mysql
+                -> mode: 0644
+                -> seuser: system_u
+                -> setype: mysqld_etc_t
+                -> force: yes
+ 
+	-> info about modules:
+		-> docs.ansible.com
+			-> module index
+		-> ansible-doc -l | grep <module-name>
+		-> ansible-doc yum
 
 
 Playbooks:
@@ -128,8 +93,16 @@ Playbooks:
 	-> yaml based text files
 		-> a yaml file MUST start with three minuses at its top: ---
 		-> after the line of minuses, comes the actual content of the playbook.
+        -> a minus (-) is required when creating yaml lists
+        -> indentation is always 2 SPACES and these 2 spaces MUST be present
 			-> a basic structure looks like this:
-				
+                    ---
+                      - hosts: <hosts>
+                        
+                        tasks:
+                          - <module>:
+                            module-property-1: value1
+                            module-property-2: value2
 				
 		-> a description starts with a " - name:" statement.
 		-> if the name part is ommited, a minus MUST be present before calling a module. e.g.: "- debug:"
@@ -176,16 +149,43 @@ Inclusions:
 
 Handlers:
 
-	-> allow running a function when an event is fired
-		-> the call defines athe order of execution, NOT the 'notify' definition
- 
+	-> handlers connect tasks to each other
+    -> a handler is a task performed AFTER a normal task is over
+    -> consists of 2 parts: 'notify' section on the linked task and 'handlers' section for the tasks to perform after the linked task is finished 
+		-> the 'handlers' part defines the ORDER of execution, NOT the 'notify' part
+
 Loops:
+	-> loop types
+		-> with_items
+		-> with_first_found
+		-> with_file
+		-> with_nested
+		-> with_sequence
 
-	-> with_items
-	-> with_first_found
+	-> the current item is called 'item' inside the loop
 
 
+Conditionals:
 
+	-> set conditions to tasks
+		-> only if a condition is met, the task is ran
+
+	-> condition examples:
+		-> <var> is defined
+		-> <var> is not defined
+		-> <var> != <var2>
+		-> <var> in <list>
+		-> <cond1> and <cond2>
+		-> <cond1> or <cond2>
+
+Tags:
+
+    -> tags are used to mark a subset of tasks for logical grouping (e.g. "prod" tasks vs "test" task etc.)
+    -> after marking tasks in tags, it is possible to run only the relevant tasks using the tag name defined for them
+    -> use the statement "tags: <tag-name>" on the module level (below the module's name) in a yaml playbook to define new tags
+    -> use the parameter "--tags" or "--skip-tags" with 'ansible' command binary to use
+    
+      
 Roles:
 
 	-> a file-system-structure-based code
@@ -214,16 +214,70 @@ ansible-vault:
 	-> to run an encrypted playbook use: ansible-playbook myPlaybook.yml --ask-vault-pass
 		-> supply the password you've created when the file was encrypted
 
-
+        
 Troubleshooting:
+    -> Handling Errors
+        -> ignore_errors: yes - continue on errors (the default behavior is to stop execution upon error)
+        -> force_handlers: yes - when set and handlers are implemented in the playbook, upon an error these handlers will run
+        -> failed_when: <condition> - an option to set a condition for a failure message. if this condition is met, the output of the run command will have
+        a failed status
+        
+    -> Debugging errors:
+        -> env var: $ANSIBLE_LOG_PATH - setup a path for Ansible's log file
+        -> yaml: - debug:
+                     var: outputthese
+            verbosity: 2 (1=basic, 2=informative)
+        -> client: -v -vv -vvv -vvvv (4 levels: 1-output, 2=input and output)
 
-	-> env var: $ANSIBLE_LOG_PATH - setup a path for Ansible's log file
-	-> yaml: - debug:
-		var: output
-		verbosity: 2 (1=basic, 2=informative)
-	-> client: -v -vv -vvv -vvvv (4 levels: 1-output, 2=input and output)
+
+Plugins:
+
+	-> can be used to manipulate the default behavior of Ansible
+		-> convert output to json
+		-> show output in different ways
+		-> send output by mail
+		-> send output to Splunk, syslog, Logstash etc. 
 
 
+Unit Testing:
+
+	-> assert/stat module
+	-> script module
+	-> use jinja2 - e.g. "fail: value1 in param1"
+	-> use the debugger - e.g. "debugger: on_failed" or debugger: on_skipped"
+
+
+ansible command line:
+
+    basic syntax:
+
+    ansible <host/group> <command>
+
+    ansible <host/group> -i <inventory-file> <command>
+
+    ansible server*.com --list-hosts
+
+
+    ad-hoc commands:
+
+        -> ansible all -a "ifconfig"
+
+    ansible all -m command id - command depends on the shell we get
+    ansible all -m raw get-content c:\ - raw simply sends the command as is
+
+    ansible all -m setup - get host info
+    ansible all -m setup -a 'filter=*eth0*'
+    ansible all -m setup -a 'filter=*ansible_user*'
+
+    ansible all copy src=/path/to/source/file dest=/path/to/dest/file
+
+    ansible localhost -m debug -a 'var=hostvars["localhost"]'
+
+    ansible all -a 'mysql -e "show grants for root@localhost;"'
+    
+    ansible-doc <module-name> - get info on how to use a module    
+    
+    
 Extra stuff
 ==================
 
@@ -255,7 +309,30 @@ Extra stuff
 
 -> read and understand the best practices manual
 
+-> handlers live at global space
 
+-> any LIST element in yaml starts with a dash char (-)
+	-> e.g: - element 1
+		- element 2
+
+	-> if a block of statements starts with only one dash, it means that the rest of the block is a part of the first statement
+	and that all of the statemts next to it are considered as ONE element of the list
+    
+-> In a Linux terminal: ctrl+shift+"+" - increase the size of the font in the terminal    
+
+-> steps are ran horizonally by default, not vertically (e.g step 1 will run for all hosts and then step 2 for all and so on ...)
+
+-> ssh/winrm/vmware api based
+	-> ssh: change sshd_config file when needed (e.g. for adding more parallel sessions etc.)
+
+-> general ansible facts:
+    -> push based
+    -> python based
+    -> uses ssh in Linux
+    -> uses powershell in Windows (along with a python module for powershell)
+    -> uses vSphere API in Vmware
+
+    
 Jinja2
 =========================
 

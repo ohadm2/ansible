@@ -1,0 +1,17 @@
+---
+- hosts: all
+  gather_facts: no
+  tasks:
+  - name: run-a-powerhsell-cmd
+    vars:
+      ansible_ssh_user: malichi
+    become: no
+    win_shell: |
+          Get-ChildItem 'C:\Program Files (x86)\Microsoft Visual Studio' | ? Name -like "*installer*"
+          Write-Host "`n`nInstaller dir size In MB:`n-----------------------------------------"
+          [math]::Round((Get-ChildItem -path 'C:\Program Files (x86)\Microsoft Visual Studio\installer' -recurse | Measure-Object -property length -sum).sum/1MB, 1)
+    register: output
+    args:
+           executable: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
+  - debug: var=output.stdout_lines
+

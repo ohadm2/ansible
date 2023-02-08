@@ -1,0 +1,17 @@
+---
+- hosts: all
+  gather_facts: no
+  tasks:
+  - name: get-all-ansible-output-fields
+    vars:
+      ansible_ssh_user: malichi
+    become: no
+    win_shell: |
+          Write-Host "`n`nTesting 123 ...:`n-----------------------------------------"
+    register: output
+    args:
+          executable: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
+  
+  - name: get-all-ansible-output-fields - print output
+    debug: var=output
+

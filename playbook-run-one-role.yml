@@ -1,0 +1,6 @@
+---
+    - hosts: all
+      vars:
+        var_to_be_used_inside_the_play: something
+      tasks:
+      - include_tasks: ../my_ansible_plays/my_specific_play.yml
